@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\SanPham;
@@ -8,41 +9,38 @@ class SanPhamController extends Controller
 {
     public function index()
     {
-        return response()->json(SanPham::all(), 200);
+        $sanphams = SanPham::all();
+        return response()->json($sanphams);
     }
 
     public function store(Request $request)
     {
-        $sanPham = SanPham::create($request->all());
-        return response()->json($sanPham, 201);
+        $sp = SanPham::create($request->all());
+        return response()->json($sp, 201);
     }
 
     public function show($id)
     {
-        $sanPham = SanPham::find($id);
-        if (!$sanPham) {
-            return response()->json(['message' => 'SanPham not found'], 404);
-        }
-        return response()->json($sanPham, 200);
+        $sp = SanPham::find($id);
+        if(!$sp) return response()->json(['message' => 'Not found'], 404);
+        return response()->json($sp);
     }
 
     public function update(Request $request, $id)
     {
-        $sanPham = SanPham::find($id);
-        if (!$sanPham) {
-            return response()->json(['message' => 'SanPham not found'], 404);
-        }
-        $sanPham->update($request->all());
-        return response()->json($sanPham, 200);
+        $sp = SanPham::find($id);
+        if(!$sp) return response()->json(['message' => 'Not found'], 404);
+
+        $sp->update($request->all());
+        return response()->json($sp);
     }
 
     public function destroy($id)
     {
-        $sanPham = SanPham::find($id);
-        if (!$sanPham) {
-            return response()->json(['message' => 'SanPham not found'], 404);
-        }
-        $sanPham->delete();
-        return response()->json(['message' => 'SanPham deleted'], 200);
+        $sp = SanPham::find($id);
+        if(!$sp) return response()->json(['message' => 'Not found'], 404);
+
+        $sp->delete();
+        return response()->json(['message' => 'Deleted successfully']);
     }
 }

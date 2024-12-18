@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\GioHang;
@@ -8,41 +9,69 @@ class GioHangController extends Controller
 {
     public function index()
     {
-        return response()->json(GioHang::all(), 200);
+        $giohangs = GioHang::all();
+        return response()->json($giohangs);
     }
 
     public function store(Request $request)
     {
-        $gioHang = GioHang::create($request->all());
-        return response()->json($gioHang, 201);
+        // Kiểm tra nếu TENDANGNHAPKH đã tồn tại
+        $exists = GioHang::where('TENDANGNHAPKH', $request->TENDANGNHAPKH)->exists();
+
+        if ($exists) {
+            return response()->json(['message' => 'Giỏ hàng đã tồn tại cho tài khoản này'], 409); // HTTP 409: Conflict
+        }
+
+        // Tạo mới nếu chưa tồn tại
+        $data = $request->validate([
+            'TENDANGNHAPKH' => 'required|string|max:50',
+            'TAMTINH' => 'nullable|numeric'
+        ]);
+
+        $gh = GioHang::create($data);
+        return response()->json($gh, 201);
     }
 
-    public function show($id)
+    public function show($tendangnhapkh)
     {
-        $gioHang = GioHang::find($id);
-        if (!$gioHang) {
-            return response()->json(['message' => 'GioHang not found'], 404);
+        // Tìm giỏ hàng theo TENDANGNHAPKH
+        $gh = GioHang::where('TENDANGNHAPKH', $tendangnhapkh)->first();
+
+        if (!$gh) {
+            return response()->json(['message' => 'Giỏ hàng không tồn tại'], 404);
         }
-        return response()->json($gioHang, 200);
+
+        return response()->json($gh);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $tendangnhapkh)
     {
-        $gioHang = GioHang::find($id);
-        if (!$gioHang) {
-            return response()->json(['message' => 'GioHang not found'], 404);
+        // Tìm giỏ hàng theo TENDANGNHAPKH
+        $gh = GioHang::where('TENDANGNHAPKH', $tendangnhapkh)->first();
+
+        if (!$gh) {
+            return response()->json(['message' => 'Giỏ hàng không tồn tại'], 404);
         }
-        $gioHang->update($request->all());
-        return response()->json($gioHang, 200);
+
+        // Cập nhật dữ liệu
+        $data = $request->validate([
+            'TAMTINH' => 'nullable|numeric'
+        ]);
+
+        $gh->update($data);
+
+        return response()->json(['message' => 'Cập nhật thành công', 'data' => $gh], 200);
     }
 
-    public function destroy($id)
+    public function destroy($tendangnhapkh)
     {
-        $gioHang = GioHang::find($id);
-        if (!$gioHang) {
-            return response()->json(['message' => 'GioHang not found'], 404);
+        $gh = GioHang::where('TENDANGNHAPKH', $tendangnhapkh)->first();
+
+        if (!$gh) {
+            return response()->json(['message' => 'Giỏ hàng không tồn tại'], 404);
         }
-        $gioHang->delete();
-        return response()->json(['message' => 'GioHang deleted'], 200);
+        $gh->delete();
+
+        return response()->json(['message' => 'Xóa thành công'], 200);
     }
 }

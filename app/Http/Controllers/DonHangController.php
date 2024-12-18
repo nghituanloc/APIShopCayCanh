@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\DonHang;
@@ -8,42 +9,38 @@ class DonHangController extends Controller
 {
     public function index()
     {
-        return response()->json(DonHang::all(), 200);
+        $donhangs = DonHang::all();
+        return response()->json($donhangs);
     }
 
     public function store(Request $request)
     {
-        $donHang = DonHang::create($request->all());
-        return response()->json($donHang, 201);
+        $dh = DonHang::create($request->all());
+        return response()->json($dh, 201);
     }
 
     public function show($id)
     {
-        $donHang = DonHang::find($id);
-        if (!$donHang) {
-            return response()->json(['message' => 'DonHang not found'], 404);
-        }
-        return response()->json($donHang, 200);
+        $dh = DonHang::find($id);
+        if(!$dh) return response()->json(['message' => 'Not found'], 404);
+        return response()->json($dh);
     }
 
     public function update(Request $request, $id)
     {
-        $donHang = DonHang::find($id);
-        if (!$donHang) {
-            return response()->json(['message' => 'DonHang not found'], 404);
-        }
-        $donHang->update($request->all());
-        return response()->json($donHang, 200);
+        $dh = DonHang::find($id);
+        if(!$dh) return response()->json(['message' => 'Not found'], 404);
+
+        $dh->update($request->all());
+        return response()->json($dh);
     }
 
     public function destroy($id)
     {
-        $donHang = DonHang::find($id);
-        if (!$donHang) {
-            return response()->json(['message' => 'DonHang not found'], 404);
-        }
-        $donHang->delete();
-        return response()->json(['message' => 'DonHang deleted'], 200);
+        $dh = DonHang::find($id);
+        if(!$dh) return response()->json(['message' => 'Not found'], 404);
+
+        $dh->delete();
+        return response()->json(['message' => 'Deleted successfully']);
     }
 }
-

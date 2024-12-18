@@ -1,25 +1,31 @@
 <?php
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class GioHang extends Model
 {
-    use HasFactory;
-
-    protected $table = 'gio_hang';
-    protected $primaryKey = 'MA_GH';
+    protected $table = 'GIOHANG';
+    protected $primaryKey = 'MAGH';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    public $timestamps = false; // Tắt time
 
     protected $fillable = [
-        'TENDANGNHAPADMIN',
-        'SO_LUONG',
-        'DON_GIA',
-        'TIEN_TAM_TINH',
+        'TENDANGNHAPKH',
+        'TAMTINH'
     ];
 
-    public function admin()
+    // Một giỏ hàng thuộc về một khách hàng
+    public function khachHang()
     {
-        return $this->belongsTo(Admin::class, 'TENDANGNHAPADMIN');
+        return $this->belongsTo(KhachHang::class, 'TENDANGNHAPKH', 'TENDANGNHAPKH');
+    }
+
+    // Giỏ hàng có nhiều sản phẩm qua bảng CHUA
+    public function sanPhams()
+    {
+        return $this->belongsToMany(SanPham::class, 'CHUA', 'MAGH', 'MASP')->withPivot('SOLUONG');
     }
 }

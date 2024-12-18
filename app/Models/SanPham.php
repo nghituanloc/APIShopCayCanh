@@ -1,26 +1,40 @@
 <?php
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SanPham extends Model
 {
-    use HasFactory;
-
-    protected $table = 'san_pham';
-    protected $primaryKey = 'MA_SP';
+    protected $table = 'SANPHAM';
+    protected $primaryKey = 'MASP';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    public $timestamps = false; // Tắt time
 
     protected $fillable = [
-        'MA_PHAN_LOAI',
-        'TEN_SP',
-        'GIA_SP',
-        'SO_LUONG_TON_KHO',
-        'MO_TA_SP',
+        'MALOAI',
+        'TENSP',
+        'HINHANHSP',
+        'MOTASP',
+        'GIASP'
     ];
 
-    public function phanLoai()
+    // Quan hệ đến loại sản phẩm
+    public function loaiSP()
     {
-        return $this->belongsTo(PhanLoaiSp::class, 'MA_PHAN_LOAI');
+        return $this->belongsTo(LoaiSP::class, 'MALOAI', 'MALOAI');
+    }
+
+    // Quan hệ nhiều-nhiều với GioHang qua bảng CHUA
+    public function gioHangs()
+    {
+        return $this->belongsToMany(GioHang::class, 'CHUA', 'MASP', 'MAGH')->withPivot('SOLUONG');
+    }
+
+    // Một sản phẩm có nhiều đánh giá
+    public function danhGias()
+    {
+        return $this->hasMany(DanhGia::class, 'MASP', 'MASP');
     }
 }

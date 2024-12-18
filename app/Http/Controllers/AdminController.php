@@ -4,92 +4,122 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
-    /**
-     * Lấy danh sách tất cả Admin.
-     */
     public function index()
     {
+        // Kiểm tra xem admin đã đăng nhập chưa (nếu cần)
+        // if(!session()->has('admin_logged_in')) {
+        //     return response()->json(['message' => 'Chưa đăng nhập'], 401);
+        // }
+
         $admins = Admin::all();
-        return response()->json($admins, 200);
+        return response()->json($admins);
     }
 
-    /**
-     * Tạo mới một Admin.
-     */
     public function store(Request $request)
     {
-        // Xác thực dữ liệu
-        $validator = Validator::make($request->all(), [
-            'TENDANGNHAPADMIN' => 'required|string|max:50|unique:admin,TENDANGNHAPADMIN',
-            'MATKHAUADMIN' => 'required|string|min:6|max:255',
-            'HOTENADMIN' => 'nullable|string|max:100',
-        ]);
+        // Kiểm tra đăng nhập trước khi cho tạo mới (tùy chính sách)
+        // if(!session()->has('admin_logged_in')) {
+        //     return response()->json(['message' => 'Chưa đăng nhập'], 401);
+        // }
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+        $data = $request->all();
+        if(isset($data['MATKHAUADMIN'])){
+            $data['MATKHAUADMIN'] = Hash::make($data['MATKHAUADMIN']);
         }
 
-        // Tạo mới Admin
-        $admin = Admin::create($request->all());
-
+        $admin = Admin::create($data);
         return response()->json($admin, 201);
     }
 
-
-    /**
-     * Lấy thông tin chi tiết một Admin.
-     */
     public function show($id)
     {
+        // if(!session()->has('admin_logged_in')) {
+        //     return response()->json(['message' => 'Chưa đăng nhập'], 401);
+        // }
+
         $admin = Admin::find($id);
-        if (!$admin) {
-            return response()->json(['message' => 'Admin not found'], 404);
-        }
-        return response()->json($admin, 200);
+        if(!$admin) return response()->json(['message' => 'Not found'], 404);
+        return response()->json($admin);
     }
 
-    /**
-     * Cập nhật thông tin một Admin.
-     */
     public function update(Request $request, $id)
     {
+        // Bỏ qua kiểm tra session để test Postman
+        // if (!session()->has('admin_logged_in')) {
+        //     return response()->json(['message' => 'Chưa đăng nhập'], 401);
+        // }
+    
+        // Tìm admin theo ID
         $admin = Admin::find($id);
         if (!$admin) {
-            return response()->json(['message' => 'Admin not found'], 404);
+            return response()->json(['message' => 'Not found'], 404);
         }
-
-        // Xác thực dữ liệu
-        $validator = Validator::make($request->all(), [
-            'TENDANGNHAPADMIN' => 'required|string|max:50|unique:admin,TENDANGNHAPADMIN,' . $id . ',TENDANGNHAPADMIN',
-            'MATKHAUADMIN' => 'nullable|string|min:6|max:255',
-            'HOTENADMIN' => 'nullable|string|max:100',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+    
+        // Chỉ lấy các trường MATKHAUADMIN và HOTENADMIN
+        $data = $request->only(['MATKHAUADMIN', 'HOTENADMIN']);
+    
+        // Kiểm tra và mã hóa mật khẩu nếu tồn tại
+        if (isset($data['MATKHAUADMIN'])) {
+            $data['MATKHAUADMIN'] = Hash::make($data['MATKHAUADMIN']);
         }
+    
+        // Cập nhật thông tin admin
+        $admin->update($data);
+    
+        // Trả về thông tin admin đã cập nhật
+        return response()->json($admin);
+    }
 
-        // Cập nhật Admin
-        $admin->update($request->all());
+    
+        public function destroy($id)
+    {
+        // if(!session()->has('admin_logged_in')) {
+        //     return response()->json(['message' => 'Chưa đăng nhập'], 401);
+        // }
 
-        return response()->json($admin, 200);
+        $admin = Admin::find($id);
+        if(!$admin) return response()->json(['message' => 'Not found'], 404);
+
+        $admin->delete();
+        return response()->json(['message' => 'Deleted successfully']);
     }
 
     /**
-     * Xóa một Admin.
+     * Đăng nhập: kiểm tra username và password.
+     * Nếu thành công, tạo session.
      */
-    public function destroy($id)
+    public function login(Request $request)
     {
-        $admin = Admin::find($id);
-        if (!$admin) {
-            return response()->json(['message' => 'Admin not found'], 404);
+        $username = $request->input('TENDANGNHAPADMIN');
+        $password = $request->input('MATKHAUADMIN');
+
+        $admin = Admin::find($username);
+        if(!$admin) {
+            return response()->json(['message' => 'Tên đăng nhập không tồn tại'], 404);
         }
 
-        $admin->delete();
-        return response()->json(['message' => 'Admin deleted'], 200);
+        if (!Hash::check($password, $admin->MATKHAUADMIN)) {
+            return response()->json(['message' => 'Sai mật khẩu'], 401);
+        }
+
+        // Tạo session lưu thông tin đăng nhập
+        session(['admin_logged_in' => $admin->TENDANGNHAPADMIN]);
+
+        return response()->json([
+            'message' => 'Đăng nhập thành công',
+            'TENDANGNHAPADMIN' => $admin->TENDANGNHAPADMIN
+        ], 200);    }
+
+    /**
+     * Đăng xuất: Xóa session
+     */
+    public function logout()
+    {
+        session()->forget('admin_logged_in');
+        return response()->json(['message' => 'Đã đăng xuất']);
     }
 }

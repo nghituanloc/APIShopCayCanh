@@ -1,31 +1,25 @@
 <?php
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class DonHang extends Model
 {
-    use HasFactory;
-
-    protected $table = 'don_hang';
-    protected $primaryKey = 'MA_DH';
+    protected $table = 'DONHANG';
+    protected $primaryKey = 'MADH';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    public $timestamps = false; // Tắt time
 
     protected $fillable = [
-        'MA_KH',
-        'MA_DG',
-        'NGAY_DAT',
-        'NGAY_NHAN',
-        'TONG_TIEN',
+        'NGAYDAT',
+        'DIACHIGIAOHANG'
     ];
 
-    public function khachHang()
+    // Một đơn hàng có nhiều chi tiết đơn hàng
+    public function chiTietDHs()
     {
-        return $this->belongsTo(KhachHang::class, 'MA_KH');
-    }
-
-    public function danhGia()
-    {
-        return $this->hasOne(DanhGiaDh::class, 'MA_DG');
+        return $this->hasMany(ChiTietDH::class, 'MADH', 'MADH');
     }
 }
