@@ -1,10 +1,11 @@
-1Cài đặt các gói phụ thuộc: Trong thư mục dự án Laravel, chạy lệnh sau để cài đặt các gói:    
+1 Cài đặt các gói phụ thuộc: Trong thư mục dự án Laravel, chạy lệnh sau để cài đặt các gói:    
 
 	composer install
 
 
 
-##Chỉnh sửa file .env để kết nôi csdl 
+1.1 Chỉnh sửa file .env để kết nôi csdl 
+
 	DB_CONNECTION=mysql  --Tên hệ quản trị
 	DB_HOST=127.0.0.1    --IP
 	DB_PORT=3306         -- Cổng
@@ -13,16 +14,17 @@
 	DB_PASSWORD=
 
 
-2. Chạy migrations để tạo csdl
+2. Chạy migrations để tạo csdl:
 
 	php artisan migrate
 
-DATA mẫu import:
+2.1 DATA mẫu import:
 
 	php artisan db:seed
 
 
 3. khởi động server bằng lệnh:
+
 	php artisan serve
 
 
