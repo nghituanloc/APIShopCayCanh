@@ -22,6 +22,11 @@ class GioHang extends Model
     {
         return $this->belongsTo(KhachHang::class, 'TENDANGNHAPKH', 'TENDANGNHAPKH');
     }
+    // Định nghĩa quan hệ 1-nhiều với bảng CHUA
+    public function chua()
+    {
+        return $this->hasMany(Chua::class, 'MAGH', 'MAGH');
+    }
 
     // Giỏ hàng có nhiều sản phẩm qua bảng CHUA
     public function sanPhams()
