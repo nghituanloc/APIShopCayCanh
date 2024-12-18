@@ -17,6 +17,11 @@ DB_PASSWORD=
 
    php artisan migrate
 
+DATA mẫu import:
+
+	php artisan db:seed
+
+
 3. khởi động server bằng lệnh:
    php artisan serve
 
