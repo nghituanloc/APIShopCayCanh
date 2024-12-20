@@ -9,7 +9,7 @@ use App\Http\Controllers\GioHangController;
 use App\Http\Controllers\KhachHangController;
 use App\Http\Controllers\LoaiSPController;
 use App\Http\Controllers\SanPhamController;
-use App\Http\Controllers\ChuaController;
+use App\Http\Controllers\ChiTietGHController; 
 
 // Route::prefix('admin')->middleware('admin.auth')->group(function () {
 //     Route::put('/{id}', action: [AdminController::class, 'update']);
@@ -36,9 +36,8 @@ Route::prefix('admin')->group(function () {
 Route::prefix('chitietdh')->group(function () {
     Route::get('/', [ChiTietDHController::class, 'index']);
     Route::post('/create', [ChiTietDHController::class, 'store']);
-    Route::get('/{id}', [ChiTietDHController::class, 'show']);
-    Route::put('/{id}', [ChiTietDHController::class, 'update']);
-    Route::delete('/{id}', [ChiTietDHController::class, 'destroy']);
+    Route::get('/{magh}/{masp}', [ChiTietDHController::class, 'show']);
+
 });
 
 // Route cho Đánh Giá
@@ -54,7 +53,8 @@ Route::prefix('danhgia')->group(function () {
 Route::prefix('donhang')->group(function () {
     Route::get('/', [DonHangController::class, 'index']);
     Route::post('/create', [DonHangController::class, 'store']);
-    Route::get('/{id}', [DonHangController::class, 'show']);
+    Route::get('/khachhang/{tendangnhapkh}', [DonHangController::class, 'show']); 
+    Route::get('/{madh}', [DonHangController::class, 'showById']);
     Route::put('/{id}', [DonHangController::class, 'update']);
     Route::delete('/{id}', [DonHangController::class, 'destroy']);
 });
@@ -95,11 +95,12 @@ Route::prefix('sanpham')->group(function () {
     Route::delete('/{id}', [SanPhamController::class, 'destroy']);
 });
 
-// Route cho Chua
-Route::prefix('chua')->group(function () {
-Route::get('/', [ChuaController::class, 'index']); // Lấy danh sách tất cả bản ghi
-Route::post('/create', [ChuaController::class, 'store']); // Thêm mới bản ghi
-Route::get('/{magh}/{masp}', [ChuaController::class, 'show']); // Xem chi tiết theo MAGH và MASP
-Route::put('/{magh}/{masp}', [ChuaController::class, 'update']); // Cập nhật thông tin theo MAGH và MASP
-Route::delete('/{magh}/{masp}', [ChuaController::class, 'destroy']); 
+// Route cho Chitietgh
+
+Route::prefix('chitietgh')->group(function () {
+    Route::get('/', [ChiTietGHController::class, 'index']); // GET /chitietgh
+    Route::post('/create', [ChiTietGHController::class, 'store']); // POST /chitietgh
+    Route::get('/{magh}/{masp}', [ChiTietGHController::class, 'show']); // GET /chitietgh/{magh}/{masp}
+    Route::put('/{magh}/{masp}', [ChiTietGHController::class, 'update']); // PUT /chitietgh/{magh}/{masp}
+    Route::delete('/{magh}/{masp}', [ChiTietGHController::class, 'destroy']); // DELETE /chitietgh/{magh}/{masp}
 });

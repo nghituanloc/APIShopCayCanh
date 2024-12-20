@@ -3,94 +3,120 @@
 namespace App\Http\Controllers;
 
 use App\Models\GioHang;
+use App\Models\ChiTietGH;
 use Illuminate\Http\Request;
 
 class GioHangController extends Controller
 {
     public function index()
     {
-        $giohangs = GioHang::all();
-        return response()->json($giohangs);
+        try {
+            $giohangs = GioHang::with('khachhang')->get();
+            return response()->json($giohangs, 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Lỗi khi lấy danh sách giỏ hàng', 'error' => $e->getMessage()], 500);
+        }
     }
 
     public function store(Request $request)
     {
-        // Kiểm tra nếu TENDANGNHAPKH đã tồn tại
-        $exists = GioHang::where('TENDANGNHAPKH', $request->TENDANGNHAPKH)->exists();
+        try {
+            // Kiểm tra nếu TENDANGNHAPKH đã tồn tại
+            $exists = GioHang::where('TENDANGNHAPKH', $request->TENDANGNHAPKH)->exists();
 
-        if ($exists) {
-            return response()->json(['message' => 'Giỏ hàng đã tồn tại cho tài khoản này'], 409); // HTTP 409: Conflict
+            if ($exists) {
+                return response()->json(['message' => 'Giỏ hàng đã tồn tại cho tài khoản này'], 409); // HTTP 409: Conflict
+            }
+
+            // Tạo mới nếu chưa tồn tại
+            $data = $request->validate([
+                'TENDANGNHAPKH' => 'required|string|max:50|exists:khachhang,TENDANGNHAPKH',
+                'TAMTINH' => 'nullable|numeric'
+            ]);
+
+            $gh = GioHang::create($data);
+            return response()->json($gh, 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['message' => 'Lỗi validate dữ liệu', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Lỗi khi tạo giỏ hàng', 'error' => $e->getMessage()], 500);
         }
-
-        // Tạo mới nếu chưa tồn tại
-        $data = $request->validate([
-            'TENDANGNHAPKH' => 'required|string|max:50',
-            'TAMTINH' => 'nullable|numeric'
-        ]);
-
-        $gh = GioHang::create($data);
-        return response()->json($gh, 201);
     }
 
     public function show($tendangnhapkh)
     {
-        // Tìm giỏ hàng theo TENDANGNHAPKH và nạp sẵn quan hệ chua.sanPham
-        $gh = GioHang::where('TENDANGNHAPKH', $tendangnhapkh)
-            ->with(['chua.sanPham'])
-            ->first();
+        try {
+            // Tìm giỏ hàng theo TENDANGNHAPKH và nạp sẵn quan hệ chitietghs.sanpham
+            $gh = GioHang::where('TENDANGNHAPKH', $tendangnhapkh)
+                ->with(['chitietghs.sanpham'])
+                ->first();
 
-        if (!$gh) {
-            return response()->json(['message' => 'Giỏ hàng không tồn tại'], 404);
+            if (!$gh) {
+                return response()->json(['message' => 'Giỏ hàng không tồn tại'], 404);
+            }
+             $data = [
+                'MAGH'          => $gh->MAGH,
+                'TENDANGNHAPKH' => $gh->TENDANGNHAPKH,
+                'TAMTINH'       => $gh->TAMTINH,
+                'SANPHAM'      => $gh->chitietghs->map(function ($chitietgh) {
+                    return [
+                        'MASP'      => $chitietgh->sanpham->MASP,
+                        'TENSP'     => $chitietgh->sanpham->TENSP,
+                        'HINHANHSP' => $chitietgh->sanpham->HINHANHSP,
+                        'GIASP'     => $chitietgh->sanpham->GIASP,
+                        'SOLUONG'   => $chitietgh->SOLUONG,
+                    ];
+                }),
+            ];
+
+            return response()->json($data, 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Lỗi khi lấy thông tin giỏ hàng', 'error' => $e->getMessage()], 500);
         }
-
-        // Lấy sản phẩm đầu tiên trong giỏ (giả sử giỏ hàng luôn có ít nhất 1 sản phẩm)
-        $chuaItem = $gh->chua->first();
-        if (!$chuaItem) {
-            return response()->json(['message' => 'Giỏ hàng không có sản phẩm'], 404);
-        }
-
-        // Chuẩn bị dữ liệu trả về
-        $data = [
-            'MAGH'            => $gh->MAGH,
-            'TENDANGNHAPKH'   => $gh->TENDANGNHAPKH,
-            'TAMTINH'         => $gh->TAMTINH,
-            'TENSP'           => $chuaItem->sanPham->TENSP,
-            'SOLUONG'         => $chuaItem->SOLUONG
-        ];
-
-        return response()->json($data);
     }
-
-
 
     public function update(Request $request, $tendangnhapkh)
     {
-        // Tìm giỏ hàng theo TENDANGNHAPKH
-        $gh = GioHang::where('TENDANGNHAPKH', $tendangnhapkh)->first();
+        try {
+            // Tìm giỏ hàng theo TENDANGNHAPKH
+            $gh = GioHang::where('TENDANGNHAPKH', $tendangnhapkh)->first();
 
-        if (!$gh) {
-            return response()->json(['message' => 'Giỏ hàng không tồn tại'], 404);
+            if (!$gh) {
+                return response()->json(['message' => 'Giỏ hàng không tồn tại'], 404);
+            }
+
+            // Cập nhật dữ liệu
+            $data = $request->validate([
+                'TAMTINH' => 'nullable|numeric'
+            ]);
+
+            $gh->update($data);
+
+            return response()->json(['message' => 'Cập nhật thành công', 'data' => $gh], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['message' => 'Lỗi validate dữ liệu', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Lỗi khi cập nhật giỏ hàng', 'error' => $e->getMessage()], 500);
         }
-
-        // Cập nhật dữ liệu
-        $data = $request->validate([
-            'TAMTINH' => 'nullable|numeric'
-        ]);
-
-        $gh->update($data);
-
-        return response()->json(['message' => 'Cập nhật thành công', 'data' => $gh], 200);
     }
 
     public function destroy($tendangnhapkh)
     {
-        $gh = GioHang::where('TENDANGNHAPKH', $tendangnhapkh)->first();
+        try {
+            $gh = GioHang::where('TENDANGNHAPKH', $tendangnhapkh)->first();
 
-        if (!$gh) {
-            return response()->json(['message' => 'Giỏ hàng không tồn tại'], 404);
+            if (!$gh) {
+                return response()->json(['message' => 'Giỏ hàng không tồn tại'], 404);
+            }
+
+            // Xóa tất cả chi tiết giỏ hàng trước
+            ChiTietGH::where('MAGH', $gh->MAGH)->delete();
+
+            $gh->delete();
+
+            return response()->json(['message' => 'Xóa thành công'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Lỗi khi xóa giỏ hàng', 'error' => $e->getMessage()], 500);
         }
-        $gh->delete();
-
-        return response()->json(['message' => 'Xóa thành công'], 200);
     }
 }

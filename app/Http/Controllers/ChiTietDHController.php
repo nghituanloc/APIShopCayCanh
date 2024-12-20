@@ -15,32 +15,54 @@ class ChiTietDHController extends Controller
 
     public function store(Request $request)
     {
-        $ct = ChiTietDH::create($request->all());
-        return response()->json($ct, 201);
+        try {
+            $data = $request->validate([
+                'MADH' => 'required|integer|exists:donhang,MADH',
+                'MASP' => 'required|integer|exists:sanpham,MASP',
+                'SOLUONGMUA' => 'required|integer|min:1',
+            ]);
+    
+            $chiTietDH = ChiTietDH::create($data);
+    
+            return response()->json($chiTietDH, 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['message' => 'Lỗi validate dữ liệu', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Lỗi khi thêm chi tiết đơn hàng', 'error' => $e->getMessage()], 500);
+        }
     }
 
-    public function show($tendangnhapkh)
+    public function show($madh, $masp)
     {
-        $chitietdh = ChiTietDH::select(
-                'CHITIETDH.*',
-                'KHACHHANG.HOTENKH',
-                'SANPHAM.TENSP',
-                'DONHANG.NGAYDAT',
-                'DONHANG.DIACHIGIAOHANG'
-            )
-            ->join('KHACHHANG', 'CHITIETDH.TENDANGNHAPKH', '=', 'KHACHHANG.TENDANGNHAPKH')
-            ->join('SANPHAM', 'CHITIETDH.MASP', '=', 'SANPHAM.MASP')
-            ->join('DONHANG', 'CHITIETDH.MADH', '=', 'DONHANG.MADH')
-            ->where('CHITIETDH.TENDANGNHAPKH', $tendangnhapkh)
-            ->get();
+        try {
+            // Lấy thông tin chi tiết đơn hàng với các quan hệ đã định nghĩa
+            $chitietdh = ChiTietDH::with(['donhang', 'sanpham'])
+                ->where('MADH', $madh)
+                ->where('MASP', $masp)
+                ->first();
     
-        if ($chitietdh->isNotEmpty()) {
-            return response()->json($chitietdh, 200);
+            // Kiểm tra nếu không tìm thấy
+            if (!$chitietdh) {
+                return response()->json(['message' => 'Không tìm thấy chi tiết đơn hàng'], 404);
+            }
+    
+            // Trả về dữ liệu ở dạng JSON
+            return response()->json([
+                'MADH'          => $chitietdh->MADH,
+                'MASP'          => $chitietdh->MASP,
+                'TENSP'         => $chitietdh->sanpham->TENSP,
+                'HINHANHSP'     => $chitietdh->sanpham->HINHANHSP,
+                'GIASP'         => $chitietdh->sanpham->GIASP,
+                'SOLUONGMUA'    => $chitietdh->SOLUONGMUA,
+                'NGAYDAT'       => $chitietdh->donhang->NGAYDAT,
+                'DIACHIGIAOHANG' => $chitietdh->donhang->DIACHIGIAOHANG,
+                'TONGTIEN_DONHANG' => $chitietdh->donhang->TONGTIEN, // Thêm tổng tiền đơn hàng
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Lỗi khi lấy thông tin chi tiết đơn hàng', 'error' => $e->getMessage()], 500);
         }
-    
-        return response()->json(['message' => 'Không có chi tiết đơn hàng nào cho tài khoản này'], 404);
     }
-    
+
     
 
     public function update(Request $request, $id)

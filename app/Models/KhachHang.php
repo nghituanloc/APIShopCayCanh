@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class KhachHang extends Model
+class KhachHang extends Authenticatable
 {
-    protected $table = 'KHACHHANG';
+    use HasFactory;
+
+    protected $table = 'khachhang';
     protected $primaryKey = 'TENDANGNHAPKH';
     public $incrementing = false;
     protected $keyType = 'string';
-    public $timestamps = false; // Thêm dòng này
-
+    public $timestamps = false;
 
     protected $fillable = [
         'TENDANGNHAPKH',
@@ -20,10 +23,35 @@ class KhachHang extends Model
         'SDTKH',
         'EMAIL',
         'DIACHI',
-        'ANHDAIDIENKH'
+        'ANHDAIDIENKH',
     ];
 
     protected $hidden = [
-        'MATKHAUKH'
+        'MATKHAUKH',
     ];
+
+     /**
+     * Get the DonHangs for the KhachHang.
+     */
+    public function donhangs()
+    {
+        return $this->hasMany(DonHang::class, 'TENDANGNHAPKH', 'TENDANGNHAPKH');
+    }
+
+     /**
+     * Get the GioHang for the KhachHang.
+     */
+    public function giohang()
+    {
+        return $this->hasOne(GioHang::class, 'TENDANGNHAPKH', 'TENDANGNHAPKH');
+    }
+
+     /**
+     * Get the DanhGia for the KhachHang.
+     */
+    public function danhgias()
+    {
+        return $this->hasMany(DanhGia::class, 'TENDANGNHAPKH', 'TENDANGNHAPKH');
+    }
+
 }

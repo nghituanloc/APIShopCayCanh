@@ -13,16 +13,15 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            KhachHangTableSeeder::class,
-            AdminTableSeeder::class,
-            LoaiSPTableSeeder::class,
-            SanPhamTableSeeder::class,
-            DonHangTableSeeder::class,
-            GioHangTableSeeder::class,
-            ChuaTableSeeder::class,
-            DanhGiaTableSeeder::class,
-            ChiTietDHTableSeeder::class
+            AdminSeeder::class,
+            KhachhangSeeder::class,
+            LoaispSeeder::class,
+            SanphamSeeder::class,
+            DonhangSeeder::class,
+            GiohangSeeder::class,
+            ChitietdhSeeder::class,
+            ChitietghSeeder::class,
+            DanhgiaSeeder::class,
         ]);
     }
-    
 }

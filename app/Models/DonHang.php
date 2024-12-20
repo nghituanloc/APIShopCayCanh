@@ -2,23 +2,39 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class DonHang extends Model
 {
-    protected $table = 'DONHANG';
+    use HasFactory;
+
+    protected $table = 'donhang';
     protected $primaryKey = 'MADH';
-    public $incrementing = true;
-    protected $keyType = 'int';
-    public $timestamps = false; // Tắt time
+    public $timestamps = false;
 
     protected $fillable = [
+        'TENDANGNHAPKH',
         'NGAYDAT',
-        'DIACHIGIAOHANG'
+        'DIACHIGIAOHANG',
+        'TONGTIEN',
+    ];
+    protected $casts = [
+        'NGAYDAT' => 'datetime:Y-m-d',
     ];
 
-    // Một đơn hàng có nhiều chi tiết đơn hàng
-    public function chiTietDHs()
+    /**
+     * Get the KhachHang that owns the DonHang.
+     */
+    public function khachhang()
+    {
+        return $this->belongsTo(KhachHang::class, 'TENDANGNHAPKH', 'TENDANGNHAPKH');
+    }
+
+    /**
+     * Get the ChiTietDHs for the DonHang.
+     */
+    public function chitietdhs()
     {
         return $this->hasMany(ChiTietDH::class, 'MADH', 'MADH');
     }

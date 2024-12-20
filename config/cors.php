@@ -20,6 +20,9 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => ['*'],
+    // 'allowed_origins' => ['http://localhost:3000','http://192.168.0.103:3000'], // Địa chỉ frontend React
+    // 'allowed_origins' => ['http://localhost:3000'], // Cho phép React frontend truy cập
+
 
     'allowed_origins_patterns' => [],
 

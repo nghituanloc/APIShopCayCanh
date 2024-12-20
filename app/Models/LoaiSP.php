@@ -2,23 +2,26 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class LoaiSP extends Model
 {
-    protected $table = 'LOAISP';
+    use HasFactory;
+
+    protected $table = 'loaisp';
     protected $primaryKey = 'MALOAI';
-    public $incrementing = true;
-    protected $keyType = 'int';
-    public $timestamps = false; // Tắt time
+    public $timestamps = false;
 
     protected $fillable = [
         'TENLOAI',
-        'MOTALOAI'
+        'MOTALOAI',
     ];
 
-    // Một loại SP có nhiều Sản phẩm
-    public function sanPhams()
+    /**
+     * Get the SanPhams for the LoaiSP.
+     */
+    public function sanphams()
     {
         return $this->hasMany(SanPham::class, 'MALOAI', 'MALOAI');
     }

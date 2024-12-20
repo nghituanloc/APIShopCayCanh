@@ -2,40 +2,37 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ChiTietDH extends Model
 {
-    protected $table = 'CHITIETDH';
-    public $timestamps = false;
-    protected $primaryKey = 'MACTDH';
-    public $incrementing = true;
+    use HasFactory;
 
-    // Composite key không hỗ trợ trực tiếp
+    protected $table = 'chitietdh';
+    public $incrementing = false;
+    public $timestamps = false;
+
 
     protected $fillable = [
         'MADH',
         'MASP',
-        'TENDANGNHAPKH',
-        'SOLUONGCTDH',
-        'TONGTIEN'
+        'SOLUONGMUA',
     ];
 
-    // Quan hệ đến DONHANG
-    public function donHang()
+    /**
+     * Get the DonHang that owns the ChiTietDH.
+     */
+    public function donhang()
     {
         return $this->belongsTo(DonHang::class, 'MADH', 'MADH');
     }
 
-    // Quan hệ đến SANPHAM
-    public function sanPham()
+    /**
+     * Get the SanPham that owns the ChiTietDH.
+     */
+    public function sanpham()
     {
         return $this->belongsTo(SanPham::class, 'MASP', 'MASP');
-    }
-
-    // Quan hệ đến KHACHHANG
-    public function khachHang()
-    {
-        return $this->belongsTo(KhachHang::class, 'TENDANGNHAPKH', 'TENDANGNHAPKH');
     }
 }

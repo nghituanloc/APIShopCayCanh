@@ -2,39 +2,55 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SanPham extends Model
 {
-    protected $table = 'SANPHAM';
+    use HasFactory;
+
+    protected $table = 'sanpham';
     protected $primaryKey = 'MASP';
-    public $incrementing = true;
-    protected $keyType = 'int';
-    public $timestamps = false; // Tắt time
+    public $timestamps = false;
 
     protected $fillable = [
         'MALOAI',
         'TENSP',
         'HINHANHSP',
         'MOTASP',
-        'GIASP'
+        'GIASP',
     ];
 
-    // Quan hệ đến loại sản phẩm
-    public function loaiSP()
+    /**
+     * Get the LoaiSP that owns the SanPham.
+     */
+    public function loaisp()
     {
         return $this->belongsTo(LoaiSP::class, 'MALOAI', 'MALOAI');
     }
 
-    // Quan hệ nhiều-nhiều với GioHang qua bảng CHUA
-    public function gioHangs()
+    /**
+     * Get the ChiTietDHs for the SanPham.
+     */
+    public function chitietdhs()
     {
-        return $this->belongsToMany(GioHang::class, 'CHUA', 'MASP', 'MAGH')->withPivot('SOLUONG');
+        return $this->hasMany(ChiTietDH::class, 'MASP', 'MASP');
     }
 
-    // Một sản phẩm có nhiều đánh giá
-    public function danhGias()
+    /**
+     * Get the ChiTietGHs for the SanPham.
+     */
+    public function chitietghs()
+    {
+        return $this->hasMany(ChiTietGH::class, 'MASP', 'MASP');
+    }
+
+    /**
+     * Get the DanhGias for the SanPham.
+     */
+    public function danhgias()
     {
         return $this->hasMany(DanhGia::class, 'MASP', 'MASP');
     }
+
 }
