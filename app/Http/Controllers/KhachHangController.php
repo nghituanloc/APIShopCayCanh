@@ -35,22 +35,22 @@ class KhachHangController extends Controller
                 'SDTKH' => 'nullable|string|max:10',
                 'EMAIL' => 'nullable|email|max:50',
                 'DIACHI' => 'nullable|string|max:255',
-                'ANHDAIDIENKH' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'ANHDAIDIENKH' => 'nullable|string|max:255',
             ]);
 
             $data = $request->all();
             $data['MATKHAUKH'] = Hash::make($data['MATKHAUKH']);
 
             // Xử lý upload ảnh đại diện
-            if ($request->hasFile('ANHDAIDIENKH')) {
-                $path = $request->file('ANHDAIDIENKH')->store('public/khachhang_images');
-                $data['ANHDAIDIENKH'] = basename($path);
-            }
+            // if ($request->hasFile('ANHDAIDIENKH')) {
+            //     $path = $request->file('ANHDAIDIENKH')->store('public/khachhang_images');
+            //     $data['ANHDAIDIENKH'] = basename($path);
+            // }
 
             $kh = KhachHang::create($data);
             return response()->json($kh, 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json(['message' => 'Lỗi validate dữ liệu', 'errors' => $e->errors()], 422);
+            return response()->json(['message' => 'Tên đăng nhập đã tồn tại vui lòng nhập tên đăng nhập khác', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Lỗi khi tạo khách hàng', 'error' => $e->getMessage()], 500);
         }
@@ -85,7 +85,7 @@ class KhachHangController extends Controller
                 'SDTKH' => 'nullable|string|max:10',
                 'EMAIL' => 'nullable|email|max:50',
                 'DIACHI' => 'nullable|string|max:255',
-                'ANHDAIDIENKH' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'ANHDAIDIENKH' => 'nullable|string|max:255',
             ]);
 
             $data = $request->all();
@@ -100,15 +100,15 @@ class KhachHangController extends Controller
                 $data['MATKHAUKH'] = Hash::make($data['MATKHAUKH']);
             }
 
-            // Xử lý upload ảnh đại diện
-            if ($request->hasFile('ANHDAIDIENKH')) {
-                // Xóa ảnh cũ nếu có
-                if ($kh->ANHDAIDIENKH) {
-                    Storage::delete('public/khachhang_images/' . $kh->ANHDAIDIENKH);
-                }
-                $path = $request->file('ANHDAIDIENKH')->store('public/khachhang_images');
-                $data['ANHDAIDIENKH'] = basename($path);
-            }
+            // // Xử lý upload ảnh đại diện
+            // if ($request->hasFile('ANHDAIDIENKH')) {
+            //     // Xóa ảnh cũ nếu có
+            //     if ($kh->ANHDAIDIENKH) {
+            //         Storage::delete('public/khachhang_images/' . $kh->ANHDAIDIENKH);
+            //     }
+            //     $path = $request->file('ANHDAIDIENKH')->store('public/khachhang_images');
+            //     $data['ANHDAIDIENKH'] = basename($path);
+            // }
 
             $kh->update($data);
             return response()->json($kh, 200);

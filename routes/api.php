@@ -52,7 +52,9 @@ Route::prefix('danhgia')->group(function () {
 // Route cho Đơn Hàng
 Route::prefix('donhang')->group(function () {
     Route::get('/', [DonHangController::class, 'index']);
+    Route::get('/donhang/baocao', [DonHangController::class, 'baoCao']);
     Route::post('/create', [DonHangController::class, 'store']);
+    
     Route::get('/khachhang/{tendangnhapkh}', [DonHangController::class, 'show']); 
     Route::get('/{madh}', [DonHangController::class, 'showById']);
     Route::put('/{id}', [DonHangController::class, 'update']);

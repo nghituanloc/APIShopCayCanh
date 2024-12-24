@@ -56,7 +56,7 @@ class ChiTietDHController extends Controller
                 'SOLUONGMUA'    => $chitietdh->SOLUONGMUA,
                 'NGAYDAT'       => $chitietdh->donhang->NGAYDAT,
                 'DIACHIGIAOHANG' => $chitietdh->donhang->DIACHIGIAOHANG,
-                'TONGTIEN_DONHANG' => $chitietdh->donhang->TONGTIEN, // Thêm tổng tiền đơn hàng
+                'TONGTIEN_DONHANG' => $chitietdh->donhang->TONGTIEN, 
             ], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Lỗi khi lấy thông tin chi tiết đơn hàng', 'error' => $e->getMessage()], 500);

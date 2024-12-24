@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SanPham;
+use App\Models\DanhGia;
 use Illuminate\Http\Request;
 
 class SanPhamController extends Controller
@@ -22,9 +23,33 @@ class SanPhamController extends Controller
     public function show($id)
     {
         $sp = SanPham::find($id);
-        if(!$sp) return response()->json(['message' => 'Not found'], 404);
-        return response()->json($sp);
+
+        if (!$sp) {
+            return response()->json(['message' => 'Không tìm thấy sản phẩm'], 404);
+        }
+
+        // Lấy các đánh giá của sản phẩm cùng với thông tin khách hàng
+        $danhGias = DanhGia::with('khachhang') 
+            ->where('MASP', $id)
+            ->get();
+
+        // Chuẩn bị dữ liệu trả về
+        $responseData = [
+            'sanpham' => $sp,
+            'danhgia' => $danhGias->map(function ($danhGia) {
+                return [
+                    'NOIDUNGDG' => $danhGia->NOIDUNGDG,
+                    'SAO' => $danhGia->SAO,
+                    'TENDANGNHAPKH' => $danhGia->TENDANGNHAPKH,
+                    'HOTENKH' => $danhGia->khachhang->HOTENKH ?? null, // Lấy tên khách hàng từ quan hệ
+                    
+                ];
+            }),
+        ];
+
+        return response()->json($responseData);
     }
+
 
     public function update(Request $request, $id)
     {
