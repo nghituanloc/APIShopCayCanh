@@ -38,9 +38,17 @@ class LoaiSPController extends Controller
     public function destroy($id)
     {
         $loai = LoaiSP::find($id);
-        if(!$loai) return response()->json(['message' => 'Not found'], 404);
-
+        if (!$loai) {
+            return response()->json(['message' => 'Not found'], 404);
+        }
+    
+        // Xóa các sản phẩm liên quan
+        $loai->sanphams()->delete();
+    
+        // Sau đó xóa loại sản phẩm
         $loai->delete();
-        return response()->json(['message' => 'Deleted successfully']);
+    
+        return response()->json(['message' => 'Xoa thành công']);
     }
+    
 }

@@ -18,7 +18,7 @@ return new class extends Migration
         
             $table->primary(['MAGH', 'MASP']);
             $table->foreign('MAGH')->references('MAGH')->on('giohang')->onDelete('restrict')->onUpdate('restrict');
-            $table->foreign('MASP')->references('MASP')->on('sanpham')->onDelete('restrict')->onUpdate('restrict');
+            $table->foreign('MASP')->references('MASP')->on('sanpham')->onDelete('cascade')->onUpdate('restrict');
         });
         
     }

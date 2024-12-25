@@ -95,5 +95,24 @@ class ChiTietDHController extends Controller
     
         return response()->json(['message' => 'Xóa thành công'], 200);
     }
-    
+    public function Baocao()
+    {
+        try {
+            $baocao = ChiTietDH::with(['donhang.khachhang', 'sanpham'])
+                ->get()
+                ->map(function ($ctdh) {
+                    return [
+                        'NGAYDAT' => $ctdh->donhang->NGAYDAT,
+                        'TONGTIEN' => $ctdh->donhang->TONGTIEN,
+                        'TENSP' => $ctdh->sanpham->TENSP,
+                        'SOLUONGMUA' => $ctdh->SOLUONGMUA,
+                        'HOTENKH' => $ctdh->donhang->khachhang->HOTENKH,
+                    ];
+                });
+
+            return response()->json($baocao, 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Lỗi khi tạo báo cáo', 'error' => $e->getMessage()], 500);
+        }
+    }
 }

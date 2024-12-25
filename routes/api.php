@@ -38,6 +38,9 @@ Route::prefix('chitietdh')->group(function () {
     Route::post('/create', [ChiTietDHController::class, 'store']);
     Route::get('/{magh}/{masp}', [ChiTietDHController::class, 'show']);
 
+    Route::get('/baocao', [ChiTietDHController::class, 'Baocao']);
+
+
 });
 
 // Route cho Đánh Giá
@@ -52,9 +55,7 @@ Route::prefix('danhgia')->group(function () {
 // Route cho Đơn Hàng
 Route::prefix('donhang')->group(function () {
     Route::get('/', [DonHangController::class, 'index']);
-    Route::get('/donhang/baocao', [DonHangController::class, 'baoCao']);
-    Route::post('/create', [DonHangController::class, 'store']);
-    
+    Route::post('/create', [DonHangController::class, 'store']);   
     Route::get('/khachhang/{tendangnhapkh}', [DonHangController::class, 'show']); 
     Route::get('/{madh}', [DonHangController::class, 'showById']);
     Route::put('/{id}', [DonHangController::class, 'update']);
@@ -95,6 +96,8 @@ Route::prefix('sanpham')->group(function () {
     Route::get('/{id}', [SanPhamController::class, 'show']);
     Route::put('/{id}', [SanPhamController::class, 'update']);
     Route::delete('/{id}', [SanPhamController::class, 'destroy']);
+    Route::put('/{id}/lsp', [SanPhamController::class, 'updateSanPhamLoai']);
+
 });
 
 // Route cho Chitietgh

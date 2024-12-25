@@ -18,8 +18,8 @@ return new class extends Migration
             $table->integer('SAO')->nullable();
         
             $table->primary(['TENDANGNHAPKH', 'MASP']);
-            $table->foreign('TENDANGNHAPKH')->references('TENDANGNHAPKH')->on('khachhang')->onDelete('restrict')->onUpdate('restrict');
-            $table->foreign('MASP')->references('MASP')->on('sanpham')->onDelete('restrict')->onUpdate('restrict');
+            $table->foreign('TENDANGNHAPKH')->references('TENDANGNHAPKH')->on('khachhang')->onDelete('cascade')->onUpdate('restrict');
+            $table->foreign('MASP')->references('MASP')->on('sanpham')->onDelete('cascade')->onUpdate('restrict');
         });
         
     }

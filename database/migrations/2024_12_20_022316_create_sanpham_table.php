@@ -18,8 +18,9 @@ return new class extends Migration
             $table->string('HINHANHSP', 255)->nullable();
             $table->longText('MOTASP')->nullable();
             $table->string('GIASP', 255)->nullable();
+
         
-            $table->foreign('MALOAI')->references('MALOAI')->on('loaisp')->onDelete('restrict')->onUpdate('restrict');
+            $table->foreign('MALOAI')->references('MALOAI')->on('loaisp')->onDelete('cascade')->onUpdate('restrict');
         });
         
     }

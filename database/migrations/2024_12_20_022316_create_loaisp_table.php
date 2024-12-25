@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('TENLOAI', 255)->nullable();
             $table->longText('MOTALOAI')->nullable();
         });
+  
+        
         
     }
 

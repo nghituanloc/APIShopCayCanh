@@ -68,4 +68,14 @@ class SanPhamController extends Controller
         $sp->delete();
         return response()->json(['message' => 'Deleted successfully']);
     }
+
+    public function updateSanPhamLoai($id)
+{
+    try {
+        SanPham::where('MALOAI', $id)->update(['MALOAI' => null]);
+        return response()->json(['message' => 'Cập nhật sản phẩm thành công'], 200);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Lỗi khi cập nhật sản phẩm', 'error' => $e->getMessage()], 500);
+    }
+}
 }

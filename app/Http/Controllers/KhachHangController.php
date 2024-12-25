@@ -112,7 +112,8 @@ class KhachHangController extends Controller
 
             $kh->update($data);
             return response()->json($kh, 200);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } 
+        catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['message' => 'Lỗi validate dữ liệu', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Lỗi khi cập nhật khách hàng', 'error' => $e->getMessage()], 500);
@@ -172,9 +173,9 @@ class KhachHangController extends Controller
                 //'token' => 'your_generated_token' // Nếu bạn sử dụng JWT
             ], 200);
         } catch(\Illuminate\Validation\ValidationException $e){
-             return response()->json(['message' => 'Lỗi validate dữ liệu', 'errors' => $e->errors()], 422);
+             return response()->json(['message' => 'Tài khoản hoặc mật khẩu không được nhập đầy đủ', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Lỗi khi đăng nhập', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Tài khoản hoặc mật khẩu chưa đúng', 'error' => $e->getMessage()], 500);
         }
     }
 

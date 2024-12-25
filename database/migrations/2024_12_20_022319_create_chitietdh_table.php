@@ -17,8 +17,8 @@ return new class extends Migration
             $table->integer('SOLUONGMUA')->nullable();
         
             $table->primary(['MADH', 'MASP']);
-            $table->foreign('MADH')->references('MADH')->on('donhang')->onDelete('restrict')->onUpdate('restrict');
-            $table->foreign('MASP')->references('MASP')->on('sanpham')->onDelete('restrict')->onUpdate('restrict');
+            $table->foreign('MADH')->references('MADH')->on('donhang')->onDelete('cascade')->onUpdate('restrict');
+            $table->foreign('MASP')->references('MASP')->on('sanpham')->onDelete('cascade')->onUpdate('restrict');
         });
         
     }

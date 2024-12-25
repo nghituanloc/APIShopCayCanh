@@ -16,9 +16,8 @@ return new class extends Migration
             $table->string('TENDANGNHAPKH', 50);
             $table->integer('TAMTINH')->nullable();
         
-            $table->foreign('TENDANGNHAPKH')->references('TENDANGNHAPKH')->on('khachhang')->onDelete('restrict')->onUpdate('restrict');
+            $table->foreign('TENDANGNHAPKH')->references('TENDANGNHAPKH')->on('khachhang')->onDelete('cascade')->onUpdate('restrict');
         });
-        
     }
 
     /**
